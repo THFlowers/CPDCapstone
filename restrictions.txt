@@ -1,0 +1,18 @@
+This implementation of parallel lacks many features from standard GNU Parallel
+Namely, this is implemented in C/C++ and lacks any hooks that perl exposes
+Likewise, for simplicity and speed, only general commands are accepted -- NO BASH HACKS
+
+That is "sleep {} ; echo {}" is not allowed
+And "{= <perl expression =}" syntax is not supported.
+
+Likewise, we won't accept bash functions.
+
+This is an acceptable compromise as:
+1) we have limited time
+2) we have limited experience
+3) C is a much more rigid language (and we are only using POSIX standard code)
+4) GNU  Parallel depends too much on bash/csh/etc. (modern shells, implicit from environment)
+
+Also, note that part of this project is proving that GNU Parallel didn't have to wait until 2007 to first develop.  This command could have existed just fine back in 1987, provided you could find a reliable multiple core machine.
+
+We believe the expressive power of parallel is lessened by dropping bash and perl support, but we believe the many of the same set of commands can still be run.  They must be made explicit by coding them into script files that are executed, as apposed to ad-hoc one-liners.

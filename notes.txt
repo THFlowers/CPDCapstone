@@ -1,0 +1,51 @@
+PSEUDO-CODE
+
+main process
+	parse command line
+		set flag variables
+		produce list of input files
+		produce list of hosts (minimum of 1 entry, NULL for local)
+		produce command string {with substitution characters still in it}
+			sanity check number of input files with references
+	
+	$SHELL fetched from environment variables
+	$PARALLEL_SSH fetched from environment variables if undefined
+	
+	determine total number of local and remote cores // sub-routine
+	create array or linked-list of that size (struct pid_t and host indicator (NULL for local))
+
+	while work to be issued (data combination from input files)
+		for i <-- core in pool && work to be issued
+
+			if (pool[i] != -1 && (ret = waitpid(WNOHANG)) != DONE)
+				next
+
+			produce concrete command string (substitute patterns) // sub-routine
+			issue a new process
+				via popen :
+					local  -- $SHELL $command
+					remote -- /bin/sh (or $SSH_COMMAND) -c $SHELL $command
+				pipe output to tmpdir buffers or to stdout (based on flags)
+
+Determine local / remote cores
+
+	There is no portable way to do this, explicitly outside POSIX standards
+		Use GNU extensions?  We are reimplementing a GNU utility here.
+		Or see how the other C based parallel implementation does it?
+
+	local machine, query # of cores
+	for remote connection
+		ssh a command to query # of cores
+
+
+NOTES:
+	tcsh / csh eats {} symbols, so must use quotes with them
+	We NEED REGEX, so this is technically POSIX/GNU so it might help
+		https://www.gnu.org/software/libc/manual/html_node/Regular-Expressions.html
+	Idea: Default for remote work is 1 process each, when merged with jobs, do jobs per server (hope multiplex works!)
+
+ https://tech-insider.org/unix/research/acrobat/8410-a.pdf
+ http://www.pcre.org/ We can get Perl regex if we use this 3rd party library
+
+ https://www.mkssoftware.com/docs/man3/regexec.3.asp
+ https://pubs.opengroup.org/onlinepubs/009695399/functions/regcomp.html
